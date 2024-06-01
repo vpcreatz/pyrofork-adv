@@ -309,14 +309,29 @@ def get_peer_id(peer: raw.base.Peer) -> int:
 
 
 def get_peer_type(peer_id: int) -> str:
-    if peer_id < 0:
-        if MIN_CHAT_ID <= peer_id:
-            return "chat"
+    """
+    Determine the type of peer based on the provided Peer ID.
 
-        if MIN_CHANNEL_ID <= peer_id < MAX_CHANNEL_ID:
-            return "channel"
-    elif 0 < peer_id <= MAX_USER_ID:
+    The function categorizes the peer into one of the following types:
+    - "user" if the Peer ID is a non-negative integer.
+    - "channel" if the Peer ID is less than -1000000000000.
+    - "chat" for any other negative Peer ID.
+
+    Parameters:
+    peer_id (int): The ID of the peer to be evaluated.
+
+    Returns:
+    str: The type of the peer, which can be "user", "channel", or "chat".
+    """
+
+    if -2147483647 <= peer_id:
+        return "chat"
+
+    if peer_id >= 0:
         return "user"
+
+    if peer_id < -1000000000000:
+        return "channel"
 
     raise ValueError(f"Peer id invalid: {peer_id}")
 
