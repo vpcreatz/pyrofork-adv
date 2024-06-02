@@ -19,10 +19,12 @@
 
 from .animation import Animation
 from .audio import Audio
+from .available_effect import AvailableEffect
 from .contact import Contact
 from .dice import Dice
 from .document import Document
 from .game import Game
+from .gifted_premium import GiftedPremium
 from .giveaway import Giveaway
 from .giveaway_launched import GiveawayLaunched
 from .giveaway_result import GiveawayResult
@@ -51,6 +53,7 @@ from .web_app_data import WebAppData
 from .web_page import WebPage
 from .web_page_empty import WebPageEmpty
 from .web_page_preview import WebPagePreview
+from .message_invoice import MessageInvoice
 from .message_reactions import MessageReactions
 from .message_reaction_updated import MessageReactionUpdated
 from .message_reaction_count_updated import MessageReactionCountUpdated
@@ -63,7 +66,7 @@ from .story_views import StoryViews
 from .exported_story_link import ExportedStoryLink
 
 __all__ = [
-    "Animation", "Audio", "Contact", "Document", "Game", "Giveaway", "GiveawayLaunched", "GiveawayResult", "Location", "MediaArea", "MediaAreaChannelPost", "MediaAreaCoordinates", "Message", "MessageEntity", "Photo", "Thumbnail",
+    "Animation", "Audio", "AvailableEffect", "Contact", "Document", "Game", "GiftedPremium", "Giveaway", "GiveawayLaunched", "GiveawayResult", "Location", "MediaArea", "MediaAreaChannelPost", "MediaAreaCoordinates", "Message", "MessageEntity", "Photo", "Thumbnail",
     "StrippedThumbnail", "Poll", "PollOption", "Sticker", "StickerSet", "Venue", "Video", "VideoNote", "Voice", "WebPage", "WebPageEmpty", "WebPagePreview", "Dice",
-    "Reaction", "WebAppData", "MessageReactions", "ReactionCount", "ReactionType", "MessageReactionUpdated", "MessageReactionCountUpdated", "MessageStory", "Story", "StoryDeleted", "StorySkipped", "StoryViews", "StoryForwardHeader", "StoriesPrivacyRules", "ExportedStoryLink"
+    "Reaction", "WebAppData", "MessageInvoice", "MessageReactions", "ReactionCount", "ReactionType", "MessageReactionUpdated", "MessageReactionCountUpdated", "MessageStory", "Story", "StoryDeleted", "StorySkipped", "StoryViews", "StoryForwardHeader", "StoriesPrivacyRules", "ExportedStoryLink"
 ]

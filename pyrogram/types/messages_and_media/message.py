@@ -192,6 +192,13 @@ class Message(Object, Update):
         quote_entities (List of :obj:`~pyrogram.types.MessageEntity`, *optional*):
             For quote text, special entities like usernames, URLs, bot commands, etc. that appear in the quote text.
 
+        effect_id (``str``, *optional*):
+            Unique identifier of the message effect added to the message.
+
+        invert_media (``bool``, *optional*):
+            True, If the media position is inverted.
+            only animation, photo, video, and webpage preview messages.
+
         audio (:obj:`~pyrogram.types.Audio`, *optional*):
             Message is an audio file, information about the file.
 
@@ -215,6 +222,9 @@ class Message(Object, Update):
 
         giveaway_result (:obj:`~pyrogram.types.GiveawayResult`, *optional*):
             Message is a giveaway result, information about the giveaway result.
+
+        invoice (:obj:`~pyrogram.types.MessageInvoice`, *optional*):
+            Message is an invoice for a payment, information about the invoice.
 
         story (:obj:`~pyrogram.types.MessageStory` | :obj:`~pyrogram.types.Story`, *optional*):
             Message is a forwarded story, information about the forwarded story.
@@ -355,6 +365,9 @@ class Message(Object, Update):
         general_topic_unhidden (:obj:`~pyrogram.types.GeneralTopicUnhidden`, *optional*):
             Service message: forum general topic unhidden
 
+        gifted_premium (:obj:`~pyrogram.types.GiftedPremium`, *optional*):
+            Info about a gifted Telegram Premium subscription
+
         giveaway_launcheded (:obj:`~pyrogram.types.GiveawayLaunched`, *optional*):
             Service message: giveaway launched.
 
@@ -373,6 +386,9 @@ class Message(Object, Update):
         web_app_data (:obj:`~pyrogram.types.WebAppData`, *optional*):
             Service message: web app data sent to the bot.
 
+        successful_payment (:obj:`~pyrogram.types.SuccessfulPayment`, *optional*):
+            Service message: successful payment.
+
         boosts_applied (``int``, *optional*):
             Service message: how many boosts were applied.
 
@@ -385,6 +401,12 @@ class Message(Object, Update):
 
         raw (``pyrogram.raw.types.Message``, *optional*):
             The raw message object, as received from the Telegram API.
+
+        gift_code (:obj:`~pyrogram.types.GiftCode`, *optional*):
+            Contains a `Telegram Premium giftcode link <https://core.telegram.org/api/links#premium-giftcode-links>`_.
+
+        gifted_premium (:obj:`~pyrogram.types.GiftedPremium`, *optional*):
+            Info about a gifted Telegram Premium subscription
 
         link (``str``, *property*):
             Generate a link to this message, only for groups and channels.
@@ -442,6 +464,8 @@ class Message(Object, Update):
         caption_entities: List["types.MessageEntity"] = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
+        effect_id: str = None,
+        invert_media: bool = None,
         audio: "types.Audio" = None,
         document: "types.Document" = None,
         photo: "types.Photo" = None,
@@ -451,6 +475,7 @@ class Message(Object, Update):
         giveaway: "types.Giveaway" = None,
         giveaway_result: "types.GiveawayResult" = None,
         boosts_applied: int = None,
+        invoice: "types.MessageInvoice" = None,
         story: Union["types.MessageStory", "types.Story"] = None,
         video: "types.Video" = None,
         voice: "types.Voice" = None,
@@ -489,12 +514,14 @@ class Message(Object, Update):
         forum_topic_edited: "types.ForumTopicEdited" = None,
         general_topic_hidden: "types.GeneralTopicHidden" = None,
         general_topic_unhidden: "types.GeneralTopicUnhidden" = None,
+        gifted_premium: "types.GiftedPremium" = None,
         giveaway_launched: "types.GiveawayLaunched" = None,
         video_chat_scheduled: "types.VideoChatScheduled" = None,
         video_chat_started: "types.VideoChatStarted" = None,
         video_chat_ended: "types.VideoChatEnded" = None,
         video_chat_members_invited: "types.VideoChatMembersInvited" = None,
         web_app_data: "types.WebAppData" = None,
+        successful_payment: "types.SuccessfulPayment" = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -546,15 +573,19 @@ class Message(Object, Update):
         self.caption_entities = caption_entities
         self.quote_text = quote_text
         self.quote_entities = quote_entities
+        self.effect_id = effect_id
+        self.invert_media = invert_media
         self.audio = audio
         self.document = document
         self.photo = photo
         self.sticker = sticker
         self.animation = animation
         self.game = game
+        self.gifted_premium = gifted_premium
         self.giveaway = giveaway
         self.giveaway_result = giveaway_result
         self.boosts_applied = boosts_applied
+        self.invoice = invoice
         self.story = story
         self.video = video
         self.voice = voice
@@ -600,6 +631,7 @@ class Message(Object, Update):
         self.video_chat_ended = video_chat_ended
         self.video_chat_members_invited = video_chat_members_invited
         self.web_app_data = web_app_data
+        self.successful_payment = successful_payment
         self.reactions = reactions
         self.raw = raw
 
@@ -702,8 +734,10 @@ class Message(Object, Update):
             video_chat_ended = None
             video_chat_members_invited = None
             web_app_data = None
+            gifted_premium = None
             giveaway_launched = None
             giveaway_result = None
+            successful_payment = None
             boosts_applied = None
 
             service_type = None
@@ -790,6 +824,9 @@ class Message(Object, Update):
             elif isinstance(action, raw.types.MessageActionWebViewDataSentMe):
                 web_app_data = types.WebAppData._parse(action)
                 service_type = enums.MessageServiceType.WEB_APP_DATA
+            elif isinstance(action, raw.types.MessageActionGiftPremium):
+                gifted_premium = await types.GiftedPremium._parse(client, action, from_user.id)
+                service_type = enums.MessageServiceType.GIFTED_PREMIUM
             elif isinstance(action, raw.types.MessageActionGiveawayLaunch):
                 giveaway_launched = types.GiveawayLaunched()
                 service_type = enums.MessageServiceType.GIVEAWAY_LAUNCHED
@@ -799,6 +836,9 @@ class Message(Object, Update):
             elif isinstance(action, raw.types.MessageActionBoostApply):
                 boosts_applied = action.boosts
                 service_type = enums.MessageServiceType.BOOST_APPLY
+            elif isinstance(action, (raw.types.MessageActionPaymentSent, raw.types.MessageActionPaymentSentMe)):
+                successful_payment = types.SuccessfulPayment._parse(client, action)
+                service_type = enums.MessageServiceType.SUCCESSFUL_PAYMENT
             from_user = types.User._parse(client, users.get(user_id, None))
             sender_chat = types.Chat._parse(client, message, users, chats, is_chat=False) if not from_user else None
 
@@ -835,8 +875,10 @@ class Message(Object, Update):
                 video_chat_ended=video_chat_ended,
                 video_chat_members_invited=video_chat_members_invited,
                 web_app_data=web_app_data,
+                gifted_premium=gifted_premium,
                 giveaway_launched=giveaway_launched,
                 giveaway_result=giveaway_result,
+                successful_payment=successful_payment,
                 boosts_applied=boosts_applied,
                 raw=message,
                 client=client
@@ -921,6 +963,7 @@ class Message(Object, Update):
             game = None
             giveaway = None
             giveaway_result = None
+            invoice = None
             story = None
             audio = None
             voice = None
@@ -1017,6 +1060,9 @@ class Message(Object, Update):
                 elif isinstance(media, raw.types.MessageMediaDice):
                     dice = types.Dice._parse(client, media)
                     media_type = enums.MessageMediaType.DICE
+                elif isinstance(media, raw.types.MessageMediaInvoice):
+                    invoice = types.MessageInvoice._parse(media)
+                    media = enums.MessageMediaType.INVOICE
                 else:
                     media = None
 
@@ -1089,6 +1135,7 @@ class Message(Object, Update):
                 edit_hide=message.edit_hide,
                 edit_date=utils.timestamp_to_datetime(message.edit_date),
                 media_group_id=message.grouped_id,
+                invert_media=message.invert_media,
                 photo=photo,
                 location=location,
                 contact=contact,
@@ -1099,6 +1146,7 @@ class Message(Object, Update):
                 game=game,
                 giveaway=giveaway,
                 giveaway_result=giveaway_result,
+                invoice=invoice,
                 story=story,
                 video=video,
                 video_note=video_note,
@@ -1113,6 +1161,7 @@ class Message(Object, Update):
                 outgoing=message.out,
                 reply_markup=reply_markup,
                 reactions=reactions,
+                effect_id=getattr(message, "effect", None),
                 raw=message,
                 client=client
             )
@@ -1247,6 +1296,7 @@ class Message(Object, Update):
         quote_entities: List["types.MessageEntity"] = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        message_effect_id: int = None,
         invert_media: bool = None,
         reply_markup=None
     ) -> "Message":
@@ -1318,6 +1368,9 @@ class Message(Object, Update):
             protect_content (``bool``, *optional*):
                 Protects the contents of the sent message from forwarding and saving.
 
+            message_effect_id (``int`` ``64-bit``, *optional*):
+                Unique identifier of the message effect to be added to the message; for private chats only.
+
             invert_media (``bool``, *optional*):
                 Move web page preview to above the message.
 
@@ -1366,6 +1419,7 @@ class Message(Object, Update):
             quote_entities=quote_entities,
             schedule_date=schedule_date,
             protect_content=protect_content,
+            message_effect_id=message_effect_id,
             invert_media=invert_media,
             reply_markup=reply_markup
         )
@@ -1862,7 +1916,10 @@ class Message(Object, Update):
     async def reply_chat_action(
         self,
         action: "enums.ChatAction",
-        business_connection_id: str = None
+        business_connection_id: str = None,
+        emoji: str = None,
+        emoji_message_id: int = None,
+        emoji_message_interaction: "raw.types.DataJSON" = None
     ) -> bool:
         """Bound method *reply_chat_action* of :obj:`~pyrogram.types.Message`.
 
@@ -1892,6 +1949,15 @@ class Message(Object, Update):
                 Business connection identifier.
                 for business bots only.
 
+            emoji (``str``, *optional*):
+                The animated emoji. Only supported for :obj:`~pyrogram.enums.ChatAction.TRIGGER_EMOJI_ANIMATION` and :obj:`~pyrogram.enums.ChatAction.WATCH_EMOJI_ANIMATION`.
+
+            emoji_message_id (``int``, *optional*):
+                Message identifier of the message containing the animated emoji. Only supported for :obj:`~pyrogram.enums.ChatAction.TRIGGER_EMOJI_ANIMATION`.
+
+            emoji_message_interaction (:obj:`raw.types.DataJSON`, *optional*):
+                Only supported for :obj:`~pyrogram.enums.ChatAction.TRIGGER_EMOJI_ANIMATION`.
+
         Returns:
             ``bool``: On success, True is returned.
 
@@ -1905,7 +1971,10 @@ class Message(Object, Update):
         return await self._client.send_chat_action(
             chat_id=self.chat.id,
             business_connection_id=business_connection_id,
-            action=action
+            action=action,
+            emoji=emoji,
+            emoji_message_id=emoji_message_id,
+            emoji_message_interaction=emoji_message_interaction
         )
 
     async def reply_contact(
@@ -2621,6 +2690,7 @@ class Message(Object, Update):
         reply_in_chat_id: Union[int, str] = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
+        view_once: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -2682,6 +2752,10 @@ class Message(Object, Update):
 
             reply_to_message_id (``int``, *optional*):
                 If the message is a reply, ID of the original message.
+
+            view_once (``bool``, *optional*):
+                Self-Destruct Timer.
+                If True, the photo will self-destruct after it was viewed.
 
             business_connection_id (``str``, *optional*):
                 Business connection identifier.
@@ -2767,6 +2841,7 @@ class Message(Object, Update):
             reply_to_chat_id=reply_to_chat_id,
             quote_text=quote_text,
             quote_entities=quote_entities,
+            view_once=view_once,
             reply_markup=reply_markup,
             progress=progress,
             progress_args=progress_args
@@ -3924,6 +3999,7 @@ class Message(Object, Update):
         parse_mode: Optional["enums.ParseMode"] = None,
         entities: List["types.MessageEntity"] = None,
         disable_web_page_preview: bool = None,
+        invert_media: bool = None,
         reply_markup: "types.InlineKeyboardMarkup" = None
     ) -> "Message":
         """Bound method *edit_text* of :obj:`~pyrogram.types.Message`.
@@ -3959,6 +4035,9 @@ class Message(Object, Update):
             disable_web_page_preview (``bool``, *optional*):
                 Disables link previews for links in this message.
 
+            invert_media (``bool``, *optional*):
+                Inverts the position of the media and caption.
+
             reply_markup (:obj:`~pyrogram.types.InlineKeyboardMarkup`, *optional*):
                 An InlineKeyboardMarkup object.
 
@@ -3975,6 +4054,7 @@ class Message(Object, Update):
             parse_mode=parse_mode,
             entities=entities,
             disable_web_page_preview=disable_web_page_preview,
+            invert_media=invert_media,
             reply_markup=reply_markup
         )
 
@@ -4453,7 +4533,15 @@ class Message(Object, Update):
             revoke=revoke
         )
 
-    async def click(self, x: Union[int, str] = 0, y: int = None, quote: bool = None, timeout: int = 10):
+    async def click(
+        self,
+        x: Union[int, str] = 0,
+        y: int = None,
+        quote: bool = None,
+        timeout: int = 10,
+        request_write_access: bool = True,
+        password: str = None
+    ):
         """Bound method *click* of :obj:`~pyrogram.types.Message`.
 
         Use as a shortcut for clicking a button attached to the message instead of:
@@ -4505,11 +4593,22 @@ class Message(Object, Update):
             timeout (``int``, *optional*):
                 Timeout in seconds.
 
+            request_write_access (``bool``, *optional*):
+                Only used in case of :obj:`~pyrogram.types.LoginUrl` button.
+                True, if the bot can send messages to the user.
+                Defaults to ``True``.
+
+            password (``str``, *optional*):
+                When clicking certain buttons (such as BotFather's confirmation button to transfer ownership), if your account has 2FA enabled, you need to provide your account's password.
+                The 2-step verification password for the current user. Only applicable, if the :obj:`~pyrogram.types.InlineKeyboardButton` contains ``requires_password``.
+
         Returns:
             -   The result of :meth:`~pyrogram.Client.request_callback_answer` in case of inline callback button clicks.
             -   The result of :meth:`~Message.reply()` in case of normal button clicks.
             -   A string in case the inline button is a URL, a *switch_inline_query* or a
                 *switch_inline_query_current_chat* button.
+            -   A string URL with the user details, in case of a WebApp button.
+            -   A :obj:`~pyrogram.types.Chat` object in case of a ``KeyboardButtonUserProfile`` button.
 
         Raises:
             RPCError: In case of a Telegram RPC error.
@@ -4563,8 +4662,53 @@ class Message(Object, Update):
                     callback_data=button.callback_data,
                     timeout=timeout
                 )
+            elif button.requires_password:
+                if password is None:
+                    raise ValueError(
+                        "This button requires a password"
+                    )
+
+                return await self._client.request_callback_answer(
+                    chat_id=self.chat.id,
+                    message_id=self.id,
+                    callback_data=button.callback_data,
+                    password=password,
+                    timeout=timeout
+                )
             elif button.url:
                 return button.url
+            elif button.web_app:
+                web_app = button.web_app
+
+                bot_peer_id = (
+                    self.via_bot and
+                    self.via_bot.id
+                ) or (
+                    self.from_user and
+                    self.from_user.is_bot and
+                    self.from_user.id
+                ) or None
+
+                if not bot_peer_id:
+                    raise ValueError(
+                        "This button requires a bot as the sender"
+                    )
+
+                r = await self._client.invoke(
+                    raw.functions.messages.RequestWebView(
+                        peer=await self._client.resolve_peer(self.chat.id),
+                        bot=await self._client.resolve_peer(bot_peer_id),
+                        url=web_app.url,
+                        platform=self._client.client_platform.value,
+                        # TODO
+                    )
+                )
+                return r.url
+            elif button.user_id:
+                return await self._client.get_chat(
+                    button.user_id,
+                    force_full=False
+                )
             elif button.switch_inline_query:
                 return button.switch_inline_query
             elif button.switch_inline_query_current_chat:
@@ -4572,7 +4716,7 @@ class Message(Object, Update):
             else:
                 raise ValueError("This button is not supported yet")
         else:
-            await self.reply(button, quote=quote)
+            await self.reply(text=button, quote=quote)
 
     async def react(self, emoji: str = "", big: bool = False, add_to_recent: bool = True) -> "types.MessageReactions":
         """Bound method *react* of :obj:`~pyrogram.types.Message`.

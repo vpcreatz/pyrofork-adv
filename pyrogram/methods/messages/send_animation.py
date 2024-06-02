@@ -56,6 +56,8 @@ class SendAnimation:
         quote_entities: List["types.MessageEntity"] = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        message_effect_id: int = None,
+        invert_media: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -150,11 +152,17 @@ class SendAnimation:
                 List of special entities that appear in quote_text, which can be specified instead of *parse_mode*.
                 for reply_to_message only.
 
+            message_effect_id (``int`` ``64-bit``, *optional*):
+                Unique identifier of the message effect to be added to the message; for private chats only.
+
             schedule_date (:py:obj:`~datetime.datetime`, *optional*):
                 Date when the message will be automatically sent.
 
             protect_content (``bool``, *optional*):
                 Protects the contents of the sent message from forwarding and saving.
+
+            invert_media (``bool``, *optional*):
+                Inverts the position of the animation and caption.
 
             reply_markup (:obj:`~pyrogram.types.InlineKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardRemove` | :obj:`~pyrogram.types.ForceReply`, *optional*):
                 Additional interface options. An object for an inline keyboard, custom reply keyboard,
@@ -278,6 +286,8 @@ class SendAnimation:
                         random_id=self.rnd_id(),
                         schedule_date=utils.datetime_to_timestamp(schedule_date),
                         noforwards=protect_content,
+                        effect=message_effect_id,
+                        invert_media=invert_media,
                         reply_markup=await reply_markup.write(self) if reply_markup else None,
                         **await utils.parse_text_entities(self, caption, parse_mode, caption_entities)
                     )

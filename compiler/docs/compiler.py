@@ -193,6 +193,7 @@ def pyrogram_api():
             edit_inline_reply_markup
             send_chat_action
             delete_messages
+            get_available_effects
             get_messages
             get_media_group
             get_chat_history
@@ -356,8 +357,10 @@ def pyrogram_api():
             set_chat_menu_button
             get_chat_menu_button
             answer_web_app_query
+            answer_pre_checkout_query
             get_bot_info
             set_bot_info
+            get_collectible_item_info
         """,
         authorization="""
         Authorization
@@ -453,6 +456,7 @@ def pyrogram_api():
             PeerChannel
             BotInfo
             ChatColor
+            CollectibleItemInfo
         """,
         messages_media="""
         Messages & Media
@@ -461,6 +465,7 @@ def pyrogram_api():
             Photo
             Thumbnail
             Audio
+            AvailableEffect
             Document
             Animation
             Video
@@ -472,9 +477,11 @@ def pyrogram_api():
             Sticker
             StickerSet
             Game
+            GiftedPremium
             Giveaway
             GiveawayLaunched
             GiveawayResult
+            MessageInvoice
             MessageStory
             WebPage
             WebPageEmpty
@@ -501,6 +508,7 @@ def pyrogram_api():
             ReactionType
             MessageReactionUpdated
             MessageReactionCountUpdated
+            SuccessfulPayment
         """,
         stories="""
         Stories
@@ -529,6 +537,7 @@ def pyrogram_api():
             ReplyKeyboardRemove
             InlineKeyboardMarkup
             InlineKeyboardButton
+            InlineKeyboardButtonBuy
             RequestPeerTypeChannel
             RequestPeerTypeChat
             RequestPeerTypeUser
@@ -543,6 +552,9 @@ def pyrogram_api():
             MenuButtonWebApp
             MenuButtonDefault
             SentWebAppMessage
+            PaymentInfo
+            PreCheckoutQuery
+            ShippingAddress
         """,
         bot_commands="""
         Bot commands
@@ -588,6 +600,10 @@ def pyrogram_api():
             InlineQueryResultVideo
             InlineQueryResultVoice
             ChosenInlineResult
+        """,
+        pre_checkout_query="""
+        PreCheckoutQuery
+            PreCheckoutQuery.answer
         """,
         input_message_content="""
         InputMessageContent
@@ -738,6 +754,10 @@ def pyrogram_api():
         inline_query="""
         InlineQuery
             InlineQuery.answer
+        """,
+        pre_checkout_query="""
+        PreCheckoutQuery
+            PreCheckoutQuery.answer
         """,
         chat_join_request="""
         ChatJoinRequest

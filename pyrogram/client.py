@@ -174,6 +174,10 @@ class Client(Methods):
             Useful for batch programs that don't need to deal with updates.
             Defaults to False (updates enabled and received).
 
+        skip_updates (``bool``, *optional*):
+            Pass True to skip pending updates that arrived while the client was offline.
+            Defaults to True.
+
         takeout (``bool``, *optional*):
             Pass True to let the client use a takeout session instead of a normal one, implies *no_updates=True*.
             Useful for exporting Telegram data. Methods invoked inside a takeout session (such as get_chat_history,
@@ -196,6 +200,10 @@ class Client(Methods):
             Set the maximum amount of concurrent transmissions (uploads & downloads).
             A value that is too high may result in network related issues.
             Defaults to 1.
+
+        client_platform (:obj:`~pyrogram.enums.ClientPlatform`, *optional*):
+            The platform where this client is running.
+            Defaults to 'other'
     """
 
     APP_VERSION = f"Pyrogram {__version__}"
@@ -221,33 +229,35 @@ class Client(Methods):
     def __init__(
         self,
         name: str,
-        api_id: Union[int, str] = None,
-        api_hash: str = None,
+        api_id: Optional[Union[int, str]] = None,
+        api_hash: Optional[str] = None,
         app_version: str = APP_VERSION,
         device_model: str = DEVICE_MODEL,
         system_version: str = SYSTEM_VERSION,
         lang_code: str = LANG_CODE,
-        ipv6: bool = False,
-        alt_port: bool = False,
-        proxy: dict = None,
-        test_mode: bool = False,
-        bot_token: str = None,
-        session_string: str = None,
-        in_memory: bool = None,
-        mongodb: dict = None,
-        storage: Storage = None,
-        phone_number: str = None,
-        phone_code: str = None,
-        password: str = None,
+        ipv6: Optional[bool] = False,
+        alt_port: Optional[bool] = False,
+        proxy: Optional[dict] = None,
+        test_mode: Optional[bool] = False,
+        bot_token: Optional[str] = None,
+        session_string: Optional[str] = None,
+        in_memory: Optional[bool] = None,
+        mongodb: Optional[dict] = None,
+        storage: Optional[Storage] = None,
+        phone_number: Optional[str] = None,
+        phone_code: Optional[str] = None,
+        password: Optional[str] = None,
         workers: int = WORKERS,
-        workdir: str = WORKDIR,
-        plugins: dict = None,
+        workdir: Union[str, Path] = WORKDIR,
+        plugins: Optional[dict] = None,
         parse_mode: "enums.ParseMode" = enums.ParseMode.DEFAULT,
-        no_updates: bool = None,
+        no_updates: Optional[bool] = None,
+        skip_updates: bool = True,
         takeout: bool = None,
         sleep_threshold: int = Session.SLEEP_THRESHOLD,
-        hide_password: bool = False,
-        max_concurrent_transmissions: int = MAX_CONCURRENT_TRANSMISSIONS
+        hide_password: Optional[bool] = False,
+        max_concurrent_transmissions: int = MAX_CONCURRENT_TRANSMISSIONS,
+        client_platform: "enums.ClientPlatform" = enums.ClientPlatform.OTHER
     ):
         super().__init__()
 
@@ -274,10 +284,12 @@ class Client(Methods):
         self.plugins = plugins
         self.parse_mode = parse_mode
         self.no_updates = no_updates
+        self.skip_updates = skip_updates
         self.takeout = takeout
         self.sleep_threshold = sleep_threshold
         self.hide_password = hide_password
         self.max_concurrent_transmissions = max_concurrent_transmissions
+        self.client_platform = client_platform
 
         self.executor = ThreadPoolExecutor(self.workers, thread_name_prefix="Handler")
 
@@ -601,6 +613,17 @@ class Client(Methods):
                 pts = getattr(update, "pts", None)
                 pts_count = getattr(update, "pts_count", None)
 
+                if pts:
+                    await self.storage.update_state(
+                        (
+                            utils.get_channel_id(channel_id) if channel_id else 0,
+                            pts,
+                            None,
+                            updates.date,
+                            None
+                        )
+                    )
+
                 if isinstance(update, raw.types.UpdateChannelTooLong):
                     log.info(update)
 
@@ -631,6 +654,16 @@ class Client(Methods):
 
                 self.dispatcher.updates_queue.put_nowait((update, users, chats))
         elif isinstance(updates, (raw.types.UpdateShortMessage, raw.types.UpdateShortChatMessage)):
+            await self.storage.update_state(
+                (
+                    0,
+                    updates.pts,
+                    None,
+                    updates.date,
+                    None
+                )
+            )
+
             diff = await self.invoke(
                 raw.functions.updates.GetDifference(
                     pts=updates.pts - updates.pts_count,
@@ -941,8 +974,7 @@ class Client(Methods):
                         location=location,
                         offset=offset_bytes,
                         limit=chunk_size
-                    ),
-                    sleep_threshold=30
+                    )
                 )
 
                 if isinstance(r, raw.types.upload.File):
@@ -977,8 +1009,7 @@ class Client(Methods):
                                 location=location,
                                 offset=offset_bytes,
                                 limit=chunk_size
-                            ),
-                            sleep_threshold=30
+                            )
                         )
 
                 elif isinstance(r, raw.types.upload.FileCdnRedirect):
