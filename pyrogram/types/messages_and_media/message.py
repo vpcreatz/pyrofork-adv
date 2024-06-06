@@ -1385,12 +1385,6 @@ class Message(Object, Update):
             RPCError: In case of a Telegram RPC error.
         """
 
-        if quote is None:
-            quote = self.chat.type != enums.ChatType.PRIVATE
-
-        if reply_to_message_id is None and quote:
-            reply_to_message_id = self.id
-
         message_thread_id = None
         if self.message_thread_id:
             message_thread_id = self.message_thread_id
@@ -1405,14 +1399,14 @@ class Message(Object, Update):
             reply_to_chat_id = self.chat.id
 
         return await self._client.send_message(
-            chat_id=chat_id,
+            chat_id=self.chat.id,
             text=text,
             parse_mode=parse_mode,
             entities=entities,
             disable_web_page_preview=disable_web_page_preview,
             disable_notification=disable_notification,
+            reply_to_message_id=self.id if quote else None,
             message_thread_id=message_thread_id,
-            reply_to_message_id=reply_to_message_id,
             business_connection_id=business_connection_id,
             reply_to_chat_id=reply_to_chat_id,
             quote_text=quote_text,
