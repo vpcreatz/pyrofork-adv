@@ -42,11 +42,38 @@ class GetStickerSet:
 
                 await app.get_sticker_set("mypack1")
         """
-        r = await self.invoke(
+        r, _ = await self._get_raw_stickers(
+            raw.types.InputStickerSetShortName(
+                short_name=short_name
+            )
+        )
+        return r
+
+
+    async def _get_raw_stickers(
+        self: "pyrogram.Client",
+        sticker_set: "raw.base.InputStickerSet"
+    ) -> "types.StickerSet":
+        """Internal Method.
+
+        Parameters:
+            sticker_set (:obj:`~pyrogram.raw.base.InputStickerSet`):
+
+        Returns:
+            List of :obj:`~pyrogram.types.Sticker`: A list of stickers is returned.
+
+        Raises:
+            ValueError: In case of invalid arguments.
+        """
+        sticker_set = await self.invoke(
             raw.functions.messages.GetStickerSet(
-                stickerset=raw.types.InputStickerSetShortName(short_name=set_short_name),
+                stickerset=sticker_set,
                 hash=0
             )
         )
-
-        return types.StickerSet._parse(r.set)
+        r = types.List([
+            await types.Sticker._parse(
+                self, doc, {type(a): a for a in doc.attributes}
+            ) for doc in sticker_set.documents
+        ])
+        return r, sticker_set.set
