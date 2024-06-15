@@ -171,6 +171,7 @@ def pyrogram_api():
             send_photo
             send_audio
             send_document
+            send_invoice
             send_sticker
             send_video
             send_animation
@@ -208,6 +209,8 @@ def pyrogram_api():
             search_messages_count
             search_global
             search_global_count
+            search_global_hashtag_messages
+            search_global_hashtag_messages_count
             download_media
             stream_media
             get_discussion_message
@@ -468,6 +471,7 @@ def pyrogram_api():
             AvailableEffect
             Document
             Animation
+            LabeledPrice
             Video
             Voice
             VideoNote
@@ -508,7 +512,6 @@ def pyrogram_api():
             ReactionType
             MessageReactionUpdated
             MessageReactionCountUpdated
-            SuccessfulPayment
         """,
         stories="""
         Stories
@@ -529,9 +532,17 @@ def pyrogram_api():
             Identifier
             Listener
         """,
+        bot="""
+        Bot
+            BotAllowed
+            BotApp
+            BotBusinessConnection
+            PaymentInfo
+            ShippingAddress
+            SuccessfulPayment
+        """,
         bot_keyboards="""
         Bot keyboards
-            BotBusinessConnection
             ReplyKeyboardMarkup
             KeyboardButton
             ReplyKeyboardRemove
@@ -552,9 +563,7 @@ def pyrogram_api():
             MenuButtonWebApp
             MenuButtonDefault
             SentWebAppMessage
-            PaymentInfo
             PreCheckoutQuery
-            ShippingAddress
         """,
         bot_commands="""
         Bot commands

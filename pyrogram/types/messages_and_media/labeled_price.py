@@ -1,5 +1,4 @@
 #  Pyrofork - Telegram MTProto API Client Library for Python
-#  Copyright (C) 2017-present Dan <https://github.com/delivrance>
 #  Copyright (C) 2022-present Mayuri-Chan <https://github.com/Mayuri-Chan>
 #
 #  This file is part of Pyrofork.
@@ -17,28 +16,30 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrofork.  If not, see <http://www.gnu.org/licenses/>.
 
-__fork_name__ = "PyroFork"
-__version__ = "2.3.25"
-__license__ = "GNU Lesser General Public License v3.0 (LGPL-3.0)"
-__copyright__ = "Copyright (C) 2022-present Mayuri-Chan <https://github.com/Mayuri-Chan>"
+from pyrogram import raw
+from ..object import Object
 
-from concurrent.futures.thread import ThreadPoolExecutor
+class LabeledPrice(Object):
+    """This object represents a price for goods or services.
 
+    Parameters:
+        label (``str``):
+            Portion label.
 
-class StopTransmission(Exception):
-    pass
+        amount (``int``):
+            Price of the product in the smallest units of the currency (integer, not float/double).
+    """
 
+    def __init__(
+        self,
+        label: str,
+        amount: int
+    ):
+        self.label = label
+        self.amount = amount
 
-class StopPropagation(StopAsyncIteration):
-    pass
-
-
-class ContinuePropagation(StopAsyncIteration):
-    pass
-
-
-from . import raw, types, filters, handlers, emoji, enums
-from .client import Client
-from .sync import idle, compose
-
-crypto_executor = ThreadPoolExecutor(1, thread_name_prefix="CryptoWorker")
+    def write(self):
+        return raw.types.LabeledPrice(
+            label=self.label,
+            amount=self.amount
+        )
