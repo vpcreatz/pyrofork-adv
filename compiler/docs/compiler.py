@@ -168,6 +168,7 @@ def pyrogram_api():
             forward_messages
             copy_message
             copy_media_group
+            send_paid_media
             send_photo
             send_audio
             send_document
@@ -229,6 +230,9 @@ def pyrogram_api():
             set_administrator_title
             set_chat_photo
             delete_chat_photo
+            delete_folder
+            export_folder_link
+            update_folder
             set_chat_title
             set_chat_description
             set_chat_permissions
@@ -241,6 +245,7 @@ def pyrogram_api():
             get_chat_members_count
             get_dialogs
             get_dialogs_count
+            get_folders
             get_forum_topics
             get_forum_topics_by_id
             set_chat_username
@@ -271,6 +276,8 @@ def pyrogram_api():
             reopen_forum_topic
             reopen_general_topic
             unhide_general_topic
+            update_color
+            update_folder
         """,
         users="""
         Users
@@ -361,6 +368,7 @@ def pyrogram_api():
             get_chat_menu_button
             answer_web_app_query
             answer_pre_checkout_query
+            answer_shipping_query
             get_bot_info
             set_bot_info
             get_collectible_item_info
@@ -452,6 +460,7 @@ def pyrogram_api():
             ChatJoinedByRequest
             ChatJoiner
             Dialog
+            Folder
             Restriction
             EmojiStatus
             ForumTopic
@@ -512,6 +521,8 @@ def pyrogram_api():
             ReactionType
             MessageReactionUpdated
             MessageReactionCountUpdated
+            ExtendedMediaPreview
+            PaidMedia
         """,
         stories="""
         Stories
@@ -539,6 +550,8 @@ def pyrogram_api():
             BotBusinessConnection
             PaymentInfo
             ShippingAddress
+            ShippingOption
+            ShippingQuery
             SuccessfulPayment
         """,
         bot_keyboards="""
@@ -614,12 +627,20 @@ def pyrogram_api():
         PreCheckoutQuery
             PreCheckoutQuery.answer
         """,
+        shipping_query="""
+        ShippingQuery
+            ShippingQuery.answer
+        """,
         input_message_content="""
         InputMessageContent
             InputMessageContent
             InputReplyToMessage
             InputReplyToStory
             InputTextMessageContent
+            InputLocationMessageContent
+            InputVenueMessageContent
+            InputContactMessageContent
+            InputInvoiceMessageContent
         """,
         authorization="""
         Authorization
@@ -767,6 +788,10 @@ def pyrogram_api():
         pre_checkout_query="""
         PreCheckoutQuery
             PreCheckoutQuery.answer
+        """,
+        shipping_query="""
+        ShippingQuery
+            ShippingQuery.answer
         """,
         chat_join_request="""
         ChatJoinRequest

@@ -102,13 +102,25 @@ class CallbackQuery(Object, Update):
                 message = await client.get_messages(chat_id, message_id)
         elif isinstance(callback_query, raw.types.UpdateInlineBotCallbackQuery):
             inline_message_id = utils.pack_inline_message_id(callback_query.msg_id)
-
+        elif isinstance(callback_query, raw.types.UpdateBusinessBotCallbackQuery):
+            message = await types.Message._parse(
+                client,
+                callback_query.message,
+                users,
+                chats,
+                is_scheduled=False,
+                replies=0,
+                business_connection_id=callback_query.connection_id,
+                raw_reply_to_message=getattr(callback_query, "reply_to_message", None)
+            )
         # Try to decode callback query data into string. If that fails, fallback to bytes instead of decoding by
         # ignoring/replacing errors, this way, button clicks will still work.
-        try:
-            data = callback_query.data.decode()
-        except (UnicodeDecodeError, AttributeError):
-            data = callback_query.data
+        data = getattr(callback_query, "data", None)
+        if data:
+            try:
+                data = data.decode()
+            except (UnicodeDecodeError, AttributeError):
+                data = data
 
         return CallbackQuery(
             id=str(callback_query.query_id),
@@ -117,7 +129,7 @@ class CallbackQuery(Object, Update):
             inline_message_id=inline_message_id,
             chat_instance=str(callback_query.chat_instance),
             data=data,
-            game_short_name=callback_query.game_short_name,
+            game_short_name=getattr(callback_query, "game_short_name", None),
             client=client
         )
 
@@ -204,7 +216,8 @@ class CallbackQuery(Object, Update):
                 text=text,
                 parse_mode=parse_mode,
                 disable_web_page_preview=disable_web_page_preview,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
+                business_connection_id=self.message.business_connection_id
             )
         else:
             return await self._client.edit_inline_text(
@@ -273,7 +286,8 @@ class CallbackQuery(Object, Update):
                 chat_id=self.message.chat.id,
                 message_id=self.message.id,
                 media=media,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
+                business_connection_id=self.message.business_connection_id
             )
         else:
             return await self._client.edit_inline_media(
@@ -305,7 +319,8 @@ class CallbackQuery(Object, Update):
             return await self._client.edit_message_reply_markup(
                 chat_id=self.message.chat.id,
                 message_id=self.message.id,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
+                business_connection_id=self.message.business_connection_id,
             )
         else:
             return await self._client.edit_inline_reply_markup(

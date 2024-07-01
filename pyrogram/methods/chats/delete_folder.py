@@ -17,22 +17,36 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrofork.  If not, see <http://www.gnu.org/licenses/>.
 
-from .input_message_content import InputMessageContent
-from .input_reply_to_message import InputReplyToMessage
-from .input_reply_to_story import InputReplyToStory
-from .input_text_message_content import InputTextMessageContent
-from .input_location_message_content import InputLocationMessageContent
-from .input_venue_message_content import InputVenueMessageContent
-from .input_contact_message_content import InputContactMessageContent
-from .input_invoice_message_content import InputInvoiceMessageContent
+import pyrogram
+from pyrogram import raw
 
-__all__ = [
-    "InputMessageContent",
-    "InputReplyToMessage",
-    "InputReplyToStory",
-    "InputTextMessageContent",
-    "InputLocationMessageContent",
-    "InputVenueMessageContent",
-    "InputContactMessageContent",
-    "InputInvoiceMessageContent"
-]
+
+class DeleteFolder:
+    async def delete_folder(
+        self: "pyrogram.Client",
+        folder_id: int
+    ) -> bool:
+        """Delete a user's folder.
+
+        .. include:: /_includes/usable-by/users.rst
+
+        Parameters:
+            folder_id (``int``):
+                Unique identifier (int) of the target folder.
+
+        Returns:
+            ``bool``: True, on success.
+
+        Example:
+            .. code-block:: python
+
+                # Delete folder
+                app.delete_folder(folder_id)
+        """
+        r = await self.invoke(
+            raw.functions.messages.UpdateDialogFilter(
+                id=folder_id
+            )
+        )
+
+        return r
