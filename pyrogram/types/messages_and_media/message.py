@@ -395,6 +395,9 @@ class Message(Object, Update):
         successful_payment (:obj:`~pyrogram.types.SuccessfulPayment`, *optional*):
             Service message: successful payment.
 
+        payment_refunded (:obj:`~pyrogram.types.PaymentRefunded`, *optional*):
+            Service message: payment refunded.
+
         boosts_applied (``int``, *optional*):
             Service message: how many boosts were applied.
 
@@ -424,7 +427,7 @@ class Message(Object, Update):
             Message is a scheduled message and has been sent.
     """
 
-    # TODO: Add game missing field. Also invoice, successful_payment, connected_website
+    # TODO: Add game missing field, Also connected_website
 
     def __init__(
         self,
@@ -530,6 +533,7 @@ class Message(Object, Update):
         video_chat_members_invited: "types.VideoChatMembersInvited" = None,
         web_app_data: "types.WebAppData" = None,
         successful_payment: "types.SuccessfulPayment" = None,
+        payment_refunded: "types.PaymentRefunded" = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -642,6 +646,7 @@ class Message(Object, Update):
         self.video_chat_members_invited = video_chat_members_invited
         self.web_app_data = web_app_data
         self.successful_payment = successful_payment
+        self.payment_refunded = payment_refunded
         self.reactions = reactions
         self.raw = raw
 
@@ -749,6 +754,7 @@ class Message(Object, Update):
             giveaway_launched = None
             giveaway_result = None
             successful_payment = None
+            payment_refunded = None
             boosts_applied = None
 
             service_type = None
@@ -792,17 +798,17 @@ class Message(Object, Update):
             elif isinstance(action, raw.types.MessageActionBotAllowed):
                 bot_allowed = types.BotAllowed._parse(client, action)
                 service_type = enums.MessageServiceType.BOT_ALLOWED
-            elif isinstance(action, raw.types.MessageActionRequestedPeer):
+            elif isinstance(action, raw.types.MessageActionRequestedPeer) or isinstance(action, raw.types.MessageActionRequestedPeerSentMe):
                 chat_shared = []
                 user_shared = []
                 for peer in action.peers:
-                    if isinstance(peer, raw.types.PeerChannel):
+                    if isinstance(peer, raw.types.PeerChannel) or isinstance(peer, raw.types.RequestedPeerChannel):
                         chat_shared.append(utils.get_channel_id(utils.get_raw_peer_id(peer)))
                         service_type = enums.MessageServiceType.ChannelShared
-                    elif isinstance(peer, raw.types.PeerChat):
+                    elif isinstance(peer, raw.types.PeerChat) or isinstance(peer, raw.types.RequestedPeerChat):
                         chat_shared.append(utils.get_channel_id(utils.get_raw_peer_id(peer)))
                         service_type = enums.MessageServiceType.ChannelShared
-                    elif isinstance(peer, raw.types.PeerUser):
+                    elif isinstance(peer, raw.types.PeerUser) or isinstance(peer, raw.types.RequestedPeerUser):
                         user_shared.append(peer.user_id)
                         service_type = enums.MessageServiceType.UserShared
             elif isinstance(action, raw.types.MessageActionTopicCreate):
@@ -856,6 +862,9 @@ class Message(Object, Update):
             elif isinstance(action, (raw.types.MessageActionPaymentSent, raw.types.MessageActionPaymentSentMe)):
                 successful_payment = types.SuccessfulPayment._parse(client, action)
                 service_type = enums.MessageServiceType.SUCCESSFUL_PAYMENT
+            elif isinstance(action, raw.types.MessageActionPaymentRefunded):
+                payment_refunded = await types.PaymentRefunded._parse(client, action)
+                service_type = enums.MessageServiceType.PAYMENT_REFUNDED
 
             parsed_message = Message(
                 id=message.id,
@@ -894,6 +903,7 @@ class Message(Object, Update):
                 giveaway_launched=giveaway_launched,
                 giveaway_result=giveaway_result,
                 successful_payment=successful_payment,
+                payment_refunded=payment_refunded,
                 boosts_applied=boosts_applied,
                 raw=message,
                 client=client
@@ -4511,7 +4521,12 @@ class Message(Object, Update):
                 return await self._client.send_poll(
                     chat_id,
                     question=self.poll.question,
-                    options=[opt.text for opt in self.poll.options],
+                    options=[
+                        types.PollOption(
+                            text=opt.text,
+                            entities=opt.entities
+                        ) for opt in self.poll.options
+                    ],
                     disable_notification=disable_notification,
                     message_thread_id=message_thread_id,
                     schedule_date=schedule_date
