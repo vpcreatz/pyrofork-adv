@@ -375,6 +375,10 @@ def pyrogram_api():
             set_bot_info
             get_collectible_item_info
         """,
+        business="""
+        Telegram Business
+            get_business_connection
+        """,
         authorization="""
         Authorization
             connect
