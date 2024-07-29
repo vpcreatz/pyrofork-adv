@@ -58,7 +58,7 @@ class GetChatPendingMembersCount:
                 )
             )
 
-            return r.chats[0].participants_count
+            return r.chats[0].requests_pending
         elif isinstance(peer, raw.types.InputPeerChannel):
             r = await self.invoke(
                 raw.functions.channels.GetFullChannel(
