@@ -93,6 +93,7 @@ class Chats(
     UnpinChatMessage,
     GetDialogs,
     GetChatMembersCount,
+    GetChatPendingMembersCount,
     SetChatUsername,
     SetChatPermissions,
     GetDialogsCount,
