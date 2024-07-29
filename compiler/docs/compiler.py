@@ -243,6 +243,7 @@ def pyrogram_api():
             get_chat_member
             get_chat_members
             get_chat_members_count
+            get_chat_pending_members_count
             get_dialogs
             get_dialogs_count
             get_folders
