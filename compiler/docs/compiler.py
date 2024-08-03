@@ -168,11 +168,9 @@ def pyrogram_api():
             forward_messages
             copy_message
             copy_media_group
-            send_paid_media
             send_photo
             send_audio
             send_document
-            send_invoice
             send_sticker
             send_video
             send_animation
@@ -195,8 +193,10 @@ def pyrogram_api():
             edit_inline_reply_markup
             send_chat_action
             delete_messages
+            delete_scheduled_messages
             get_available_effects
             get_messages
+            get_scheduled_messages
             get_media_group
             get_chat_history
             get_chat_history_count
@@ -368,16 +368,21 @@ def pyrogram_api():
             set_chat_menu_button
             get_chat_menu_button
             answer_web_app_query
-            answer_pre_checkout_query
-            answer_shipping_query
-            refund_star_payment
             get_bot_info
             set_bot_info
             get_collectible_item_info
         """,
         business="""
         Telegram Business
+            answer_pre_checkout_query
+            answer_shipping_query
+            create_invoice_link
             get_business_connection
+            get_stars_transactions
+            get_stars_transactions_by_id
+            refund_star_payment
+            send_invoice
+            send_paid_media
         """,
         authorization="""
         Authorization
@@ -396,6 +401,7 @@ def pyrogram_api():
             recover_password
             accept_terms_of_service
             log_out
+            get_active_sessions
         """,
         advanced="""
         Advanced
@@ -500,7 +506,6 @@ def pyrogram_api():
             Giveaway
             GiveawayLaunched
             GiveawayResult
-            MessageInvoice
             MessageStory
             WebPage
             WebPageEmpty
@@ -527,8 +532,6 @@ def pyrogram_api():
             ReactionType
             MessageReactionUpdated
             MessageReactionCountUpdated
-            ExtendedMediaPreview
-            PaidMedia
         """,
         stories="""
         Stories
@@ -554,12 +557,6 @@ def pyrogram_api():
             BotAllowed
             BotApp
             BotBusinessConnection
-            PaymentInfo
-            PaymentRefunded
-            ShippingAddress
-            ShippingOption
-            ShippingQuery
-            SuccessfulPayment
         """,
         bot_keyboards="""
         Bot keyboards
@@ -572,6 +569,9 @@ def pyrogram_api():
             RequestPeerTypeChannel
             RequestPeerTypeChat
             RequestPeerTypeUser
+            RequestedChats
+            RequestedChat
+            RequestedUser
             LoginUrl
             ForceReply
             CallbackQuery
@@ -596,6 +596,21 @@ def pyrogram_api():
             BotCommandScopeChat
             BotCommandScopeChatAdministrators
             BotCommandScopeChatMember
+        """,
+        business="""
+        Telegram Business
+            ExtendedMediaPreview
+            InputStarsTransaction
+            Invoice
+            PaidMedia
+            PaymentInfo
+            PaymentRefunded
+            ShippingAddress
+            ShippingOption
+            ShippingQuery
+            StarsStatus
+            StarsTransaction
+            SuccessfulPayment
         """,
         input_media="""
         Input Media
@@ -651,6 +666,8 @@ def pyrogram_api():
         """,
         authorization="""
         Authorization
+            ActiveSession
+            ActiveSessions
             SentCode
             TermsOfService
         """
